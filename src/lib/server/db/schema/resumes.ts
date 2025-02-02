@@ -2,23 +2,20 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { Orm } from '../helpers';
 import type { z } from 'zod';
 
-const table = Orm.table('resume', {
+export const Resumes = Orm.table('resume', {
 	name: Orm.text().notNull(),
 	tags: Orm.text(),
 	bucketPath: Orm.text().notNull()
 });
 
-const select = createSelectSchema(table);
-const insert = createInsertSchema(table).omit({ createdAt: true, updatedAt: true });
+const select = createSelectSchema(Resumes);
+const insert = createInsertSchema(Resumes).omit({ createdAt: true, updatedAt: true });
 const update = insert.partial();
 
-export type Resume = z.infer<typeof select>;
+export type Resume = typeof Resumes.$inferInsert;
+export type ResumeUI = z.infer<typeof select>;
+
 export type CreateResume = z.infer<typeof insert>;
 export type UpdateResume = z.infer<typeof update>;
 
-export const Resumes = {
-	table,
-	select,
-	insert,
-	update
-};
+export const ResumesSchema = { select, insert, update };

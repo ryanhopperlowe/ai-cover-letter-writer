@@ -1,10 +1,10 @@
-import { hash, verify } from '@node-rs/argon2';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import { hash, verify } from '@node-rs/argon2';
+import { fail, redirect } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
+
+import { Users } from '$lib/server/db/schema/users';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -29,7 +29,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password (min 6, max 255 characters)' });
 		}
 
-		const results = await db.select().from(table.user).where(eq(table.user.username, username));
+		const results = await db.select().from(Users).where(eq(Users.email, username));
 
 		const existingUser = results.at(0);
 		if (!existingUser) {
@@ -64,7 +64,6 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password' });
 		}
 
-		const userId = generateUserId();
 		const passwordHash = await hash(password, {
 			// recommended minimum parameters
 			memoryCost: 19456,
@@ -74,24 +73,21 @@ export const actions: Actions = {
 		});
 
 		try {
-			await db.insert(table.user).values({ id: userId, username, passwordHash });
+			const [{ id: userId }] = await db
+				.insert(Users)
+				.values({ email: username, passwordHash })
+				.returning();
 
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, userId);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (e) {
+			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
 		}
 		return redirect(302, '/demo/lucia');
 	}
 };
-
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
 
 function validateUsername(username: unknown): username is string {
 	return (

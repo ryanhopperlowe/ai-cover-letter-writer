@@ -1,22 +1,19 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import type { z } from 'zod';
-import { Orm } from './../helpers';
+import { z } from 'zod';
+import { Orm } from '../helpers';
 
-const table = Orm.table('user', {
-	email: Orm.text('email').notNull().unique()
+export const Users = Orm.table('user', {
+	email: Orm.text('email').notNull().unique(),
+	passwordHash: Orm.text('password_hash').notNull()
 });
 
-const select = createSelectSchema(table);
-const insert = createInsertSchema(table).omit({ createdAt: true, updatedAt: true });
-const update = insert.partial();
+const select = createSelectSchema(Users).omit({ passwordHash: true });
+const insert = createInsertSchema(Users)
+	.omit({ createdAt: true, updatedAt: true, passwordHash: true })
+	.extend({ password: z.string().min(6).max(255) });
 
-export type User = z.infer<typeof select>;
-export type CreateUser = z.infer<typeof insert>;
-export type UpdateUser = z.infer<typeof update>;
+export const UsersSchema = { select, insert };
 
-export const Users = {
-	table,
-	select,
-	insert,
-	update
-};
+export type User = typeof Users.$inferInsert;
+export type UserUI = z.infer<typeof select>;
+export type RegisterUser = z.infer<typeof insert>;
