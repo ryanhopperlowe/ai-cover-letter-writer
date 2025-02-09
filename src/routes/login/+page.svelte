@@ -22,11 +22,12 @@
 				<Input type="password" name="password" />
 			</label>
 
+			<p style="color: red;">{form?.message ?? ''}</p>
+
 			<nav class="flex flex-row-reverse gap-4">
 				<Button type="submit">Login</Button>
 				<Button variant="outline" type="submit" formaction="?/register">Register</Button>
 			</nav>
 		</form>
-		<p style="color: red;">{form?.message ?? ''}</p>
 	</div>
 </div>
