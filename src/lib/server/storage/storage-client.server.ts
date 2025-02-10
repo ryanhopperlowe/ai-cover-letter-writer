@@ -79,13 +79,13 @@ class StorageClientClass {
 	}
 
 	#getKey({ format, userId, itemId }: KeyParams) {
-		let prefix = `${this.prefix}/${userId}/${format}`;
+		let prefix = `${this.prefix}/${userId}`;
 
 		if (itemId) {
 			prefix += `/${itemId}`;
 		}
 
-		return prefix;
+		return `${prefix}/${format}`;
 	}
 }
 
