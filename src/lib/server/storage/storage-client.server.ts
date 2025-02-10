@@ -32,7 +32,7 @@ const S3 = new S3Client({
 });
 
 type KeyParams = {
-	format: string;
+	format: 'pdf';
 	userId: string;
 	itemId?: string;
 };
@@ -85,7 +85,7 @@ class StorageClientClass {
 			prefix += `/${itemId}`;
 		}
 
-		return `${prefix}/${format}`;
+		return `${prefix}.${format}`;
 	}
 }
 
