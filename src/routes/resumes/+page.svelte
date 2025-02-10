@@ -1,17 +1,28 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
+	import { route } from '$lib/ROUTES';
 	import Icon from '@iconify/svelte';
-	import type { PageData } from './$types';
+	import ResumeForm from './ResumeForm.svelte';
+	import { cn } from '$lib/utils';
+	import DeleteResume from './DeleteResume.svelte';
+
+	let { data } = $props();
 </script>
 
-<h1>Resumes</h1>
+<main class="mx-auto flex max-w-2xl flex-col gap-4 pt-10">
+	<div class="flex justify-end">
+		<ResumeForm />
+	</div>
 
-<form action="?/upload" method="post" enctype="multipart/form-data" use:enhance>
-	<Input type="file" name="file" />
-	<Button type="submit">
-		<Icon icon="lucide:plus" />
-		Add Resume
-	</Button>
-</form>
+	<div class="flex flex-col gap-4">
+		{#each data.resumes ?? [] as resume}
+			<div class="flex justify-between gap-2">
+				<h2>{resume.name}</h2>
+
+				<div class={cn('flex gap-2')}>
+					<DeleteResume {resume} />
+				</div>
+			</div>
+		{/each}
+	</div>
+</main>

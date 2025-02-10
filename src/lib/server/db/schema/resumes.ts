@@ -1,11 +1,15 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { Orm } from '../helpers';
 import type { z } from 'zod';
+import { Users } from './users';
 
 export const Resumes = Orm.table('resume', {
 	name: Orm.text().notNull(),
 	tags: Orm.text(),
-	bucketPath: Orm.text().notNull()
+	bucketPath: Orm.text().notNull(),
+	userId: Orm.uuid()
+		.notNull()
+		.references(() => Users.id)
 });
 
 const select = createSelectSchema(Resumes);
