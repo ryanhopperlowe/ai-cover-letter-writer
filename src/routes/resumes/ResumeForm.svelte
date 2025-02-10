@@ -33,7 +33,7 @@
 			enctype="multipart/form-data"
 			use:enhance={formState.submit}
 		>
-			<Input type="file" name="file" />
+			<Input type="file" name="file" accept="application/pdf" />
 
 			<Button type="submit" loading={formState.loading}>
 				<Icon icon="lucide:plus" />
