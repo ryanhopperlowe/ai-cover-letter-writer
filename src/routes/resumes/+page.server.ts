@@ -5,6 +5,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { Resumes, ResumesSchema } from '$lib/server/db/schema/resumes';
 import { eq } from 'drizzle-orm';
+import { AiService } from '$lib/server/openai';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -63,5 +64,17 @@ export const actions: Actions = {
 		await db.delete(Resumes).where(eq(Resumes.id, id));
 
 		return { success: true };
+	},
+	test: async ({ locals }) => {
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
+		}
+
+		const res = await AiService.test();
+
+		console.log(res);
+
+		return { res };
 	}
 };
