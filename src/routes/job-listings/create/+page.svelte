@@ -17,16 +17,18 @@
 		return async ({ update }) => update().then(() => (loading = false));
 	}}
 >
-	<div>
-		<Label for="title">Job Title</Label>
-		<Input name="title" value={form?.data?.title ?? ''} />
-		<p class="text-red-500">{form?.errors?.validation.title}</p>
-	</div>
+	<div class="flex w-full gap-2">
+		<div class="flex-1">
+			<Label for="companyName">Company Name</Label>
+			<Input name="companyName" value={form?.data?.companyName ?? ''} />
+			<p class="text-red-500">{form?.errors?.validation.companyName}</p>
+		</div>
 
-	<div>
-		<Label for="companyName">Company Name</Label>
-		<Input name="companyName" value={form?.data?.companyName ?? ''} />
-		<p class="text-red-500">{form?.errors?.validation.companyName}</p>
+		<div class="flex-1">
+			<Label for="title">Job Title</Label>
+			<Input name="title" value={form?.data?.title ?? ''} />
+			<p class="text-red-500">{form?.errors?.validation.title}</p>
+		</div>
 	</div>
 
 	<div>
