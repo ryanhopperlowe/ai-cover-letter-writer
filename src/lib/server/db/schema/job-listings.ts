@@ -1,11 +1,12 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { Orm } from '../helpers';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { Users } from './users';
 
 export const JobListings = Orm.table('job_listing', {
+	title: Orm.text().notNull(),
 	companyName: Orm.text().notNull(),
-	jobDescription: Orm.text().notNull(),
+	content: Orm.text().notNull(),
 	hiringManager: Orm.text(),
 	mission: Orm.text(),
 
@@ -15,7 +16,13 @@ export const JobListings = Orm.table('job_listing', {
 });
 
 const select = createSelectSchema(JobListings);
-const insert = createInsertSchema(JobListings).omit({
+const insert = createInsertSchema(JobListings, {
+	title: z.string().min(1, 'Required').max(30),
+	companyName: z.string().min(1, 'Required').max(30),
+	content: z.string().min(1, 'Required'),
+	hiringManager: z.string().max(30).optional(),
+	mission: z.string().optional()
+}).omit({
 	createdAt: true,
 	updatedAt: true
 });
@@ -23,7 +30,7 @@ const update = insert.omit({ id: true, userId: true });
 
 export const JobListingShema = { select, insert, update };
 
-export type JobListing = typeof JobListings.$inferInsert;
+export type JobListing = typeof JobListings.$inferSelect;
 export type JobListingUI = z.infer<typeof select>;
 export type CreateJobListing = z.infer<typeof insert>;
 export type UpdateJobListing = z.infer<typeof update>;

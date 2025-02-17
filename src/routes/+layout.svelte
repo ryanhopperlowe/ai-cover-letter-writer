@@ -17,6 +17,10 @@
 				</li>
 
 				<li>
+					<Button variant="ghost" href={route('/job-listings')}>Job Listings</Button>
+				</li>
+
+				<li>
 					<form action={route('logout /')} method="POST">
 						<Button variant="ghost" type="submit">Logout</Button>
 					</form>

@@ -10,6 +10,8 @@
  */
 const PAGES = {
   "/": `/`,
+  "/job-listings": `/job-listings`,
+  "/job-listings/create": `/job-listings/create`,
   "/login": `/login`,
   "/resumes": `/resumes`
 }
@@ -26,6 +28,9 @@ const SERVERS = {
  */
 const ACTIONS = {
   "logout /": `/?/logout`,
+  "create /job-listings": `/job-listings?/create`,
+  "delete /job-listings": `/job-listings?/delete`,
+  "default /job-listings/create": `/job-listings/create`,
   "login /login": `/login?/login`,
   "register /login": `/login?/register`,
   "upload /resumes": `/resumes?/upload`,
@@ -145,9 +150,9 @@ export function route<T extends keyof AllTypes>(key: T, ...params: any[]): strin
 * ```
 */
 export type KIT_ROUTES = {
-  PAGES: { '/': never, '/login': never, '/resumes': never }
+  PAGES: { '/': never, '/job-listings': never, '/job-listings/create': never, '/login': never, '/resumes': never }
   SERVERS: Record<string, never>
-  ACTIONS: { 'logout /': never, 'login /login': never, 'register /login': never, 'upload /resumes': never, 'delete /resumes': never, 'test /resumes': never }
+  ACTIONS: { 'logout /': never, 'create /job-listings': never, 'delete /job-listings': never, 'default /job-listings/create': never, 'login /login': never, 'register /login': never, 'upload /resumes': never, 'delete /resumes': never, 'test /resumes': never }
   LINKS: Record<string, never>
   Params: Record<string, never>
 }

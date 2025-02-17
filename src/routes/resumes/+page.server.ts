@@ -59,6 +59,10 @@ export const actions: Actions = {
 			return fail(404, { message: 'Resume not found' });
 		}
 
+		if (resume.userId !== user.id) {
+			return fail(403, { message: 'Forbidden' });
+		}
+
 		await StorageClient.deleteObject(user.id, resume.bucketPath);
 
 		await db.delete(Resumes).where(eq(Resumes.id, id));

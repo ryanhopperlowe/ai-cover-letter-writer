@@ -7,7 +7,7 @@
 	import { route } from '$lib/ROUTES';
 	import Icon from '@iconify/svelte';
 
-	let formState = new FormState().onSubmit(() => (open = false));
+	let formState = new FormState().onSuccess(() => (open = false));
 	let open = $state(false);
 </script>
 

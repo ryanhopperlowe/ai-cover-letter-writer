@@ -2,20 +2,22 @@ import type { SubmitFunction } from '@sveltejs/kit';
 
 export class FormState {
 	loading = $state(false);
-	onSubmitFns: (() => void)[] = [];
 
-	onSubmit(fn: () => void) {
-		this.onSubmitFns.push(fn);
+	onSuccessFns: (() => void)[] = [];
+
+	onSuccess(fn: () => void) {
+		this.onSuccessFns.push(fn);
 
 		return this;
 	}
 
 	submit: SubmitFunction = () => {
 		this.loading = true;
+
 		return ({ update }) => {
 			this.loading = false;
 
-			this.onSubmitFns.forEach((fn) => fn());
+			this.onSuccessFns.forEach((fn) => fn());
 
 			update();
 		};
