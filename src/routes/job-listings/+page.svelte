@@ -13,11 +13,12 @@
 </div>
 
 <div class="flex flex-col gap-4">
-	{#each data.listings ?? [] as { companyName, id }}
+	{#each data.listings ?? [] as { companyName, title, id }}
 		<div class="flex justify-between gap-2">
-			<h2>{companyName}</h2>
+			<h2>{companyName} - {title}</h2>
 
 			<div class={cn('flex gap-2')}>
+				<Button variant="link" href={route('/job-listings/[id]', { id })}>Apply</Button>
 				<DeleteJobListing {id} />
 			</div>
 		</div>

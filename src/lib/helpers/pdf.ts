@@ -1,8 +1,8 @@
 import * as pdfjs from 'pdfjs-dist';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-export async function getPdfTextContent(file: File) {
-	const pdf = await pdfjs.getDocument(await file.arrayBuffer()).promise;
+export async function getPdfTextContent(buffer: ArrayBuffer) {
+	const pdf = await pdfjs.getDocument(buffer).promise;
 
 	return (
 		await Promise.all(Array.from({ length: pdf.numPages }, (_, i) => getPageContent(pdf, i + 1)))

@@ -65,7 +65,7 @@ class StorageClientClass {
 			new PutObjectCommand({
 				Bucket: BucketName,
 				Key: key,
-				Body: await file.text()
+				Body: new Uint8Array(await file.arrayBuffer())
 			})
 		);
 

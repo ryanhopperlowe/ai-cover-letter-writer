@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { Orm } from '../helpers';
 import { z } from 'zod';
+import { Orm } from '../helpers';
 import { Users } from './users';
 
 export const JobListings = Orm.table('job_listing', {

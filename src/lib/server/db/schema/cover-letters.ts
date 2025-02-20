@@ -1,10 +1,8 @@
-import { relations } from 'drizzle-orm';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { z } from 'zod';
 import { Orm } from '../helpers';
 import { JobListings } from './job-listings';
-import { Resumes } from './resumes';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { Users } from './users';
-import { z } from 'zod';
 
 export const CoverLetters = Orm.table('cover_letter', {
 	content: Orm.text().notNull(),
@@ -15,15 +13,9 @@ export const CoverLetters = Orm.table('cover_letter', {
 		.references(() => Users.id)
 });
 
-export const CoverLetterRelations = relations(CoverLetters, ({ many }) => ({
-	resumes: many(Resumes)
-}));
-
 const select = createSelectSchema(CoverLetters);
 const insert = createInsertSchema(CoverLetters).omit({ createdAt: true, updatedAt: true });
-const update = insert.omit({ userId: true, id: true }).extend({
-	resumesIds: z.string().uuid().array()
-});
+const update = insert.omit({ userId: true, id: true });
 
 export const CoverLettersSchema = { select, insert, update };
 
