@@ -1,7 +1,7 @@
 import { getPdfTextContent } from '$lib/helpers/pdf';
 import { route } from '$lib/ROUTES';
 import { db } from '$lib/server/db';
-import { CoverLetters } from '$lib/server/db/schema/cover-letters';
+import { CoverLetters, CoverLettersSchema } from '$lib/server/db/schema/cover-letters';
 import { JobListings } from '$lib/server/db/schema/job-listings';
 import { Resumes, ResumesSchema } from '$lib/server/db/schema/resumes';
 import { AiService } from '$lib/server/openai';
@@ -23,7 +23,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	if (!listing) redirect(302, route('/job-listings'));
 
-	return { listing, resumes };
+	const coverLetters = await db.select().from(CoverLetters).where(eq(CoverLetters.jobListing, id));
+
+	return { listing, resumes, coverLetters };
 };
 
 export const actions = {
@@ -79,14 +81,43 @@ export const actions = {
 
 		const coverLetterContent = await AiService.generateCoverLetter(listing.content, textContent);
 
-		if (coverLetterContent.content === null) {
+		if (coverLetterContent === null) {
 			return fail(500, { errors: { form: ['Failed to generate cover letter'] } });
 		}
 
 		await db.insert(CoverLetters).values({
-			content: coverLetterContent.content,
+			content: coverLetterContent,
 			userId: user.id,
 			jobListing
 		});
+	},
+	deleteCoverLetter: async ({ request, locals }) => {
+		if (!locals.user) {
+			redirect(302, route('/login'));
+		}
+
+		const errors = <T extends object>(errors: T) => {
+			return {
+				action: 'deleteCoverLetter' as const,
+				errors
+			};
+		};
+
+		const formData = Object.fromEntries(await request.formData());
+		const { data, success } = CoverLettersSchema.select.pick({ id: true }).safeParse(formData);
+
+		if (!success) {
+			return fail(400, errors({ form: ['Invalid Cover letter ID'] }));
+		}
+
+		const { id } = data;
+
+		const [coverLetter] = await db.select().from(CoverLetters).where(eq(CoverLetters.id, id));
+
+		if (!coverLetter) {
+			return fail(404, errors({ form: ['Cover letter not found'] }));
+		}
+
+		await db.delete(CoverLetters).where(eq(CoverLetters.id, id));
 	}
 } satisfies Actions;

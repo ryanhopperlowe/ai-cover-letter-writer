@@ -10,7 +10,8 @@ export const CoverLetters = Orm.table('cover_letter', {
 	jobListing: Orm.uuid().references(() => JobListings.id),
 	userId: Orm.uuid()
 		.notNull()
-		.references(() => Users.id)
+		.references(() => Users.id),
+	copiedFromId: Orm.uuid()
 });
 
 const select = createSelectSchema(CoverLetters);

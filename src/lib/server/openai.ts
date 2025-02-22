@@ -19,7 +19,7 @@ class AiServiceClass {
 				{
 					role: 'system',
 					content: `
-You are a cover letter writing assistant, given a list of resumes, and a job description, write a compelling cover letter to ensure the user lands their dream job!
+You are a cover letter writing assistant, given a list of resumes, and a job description, write a compelling cover letter to ensure the user lands their dream job! Make sure to output the content in markdown format.
           `
 				},
 				{
@@ -49,26 +49,11 @@ You are a cover letter writing assistant, given a list of resumes, and a job des
 			response_format: zodResponseFormat(CoverLetterSchema, 'event')
 		});
 
-		return res.choices.map((c) => c.message)[0];
-	}
+		const content = res.choices.map((c) => c.message)[0].content;
 
-	async test() {
-		const res = await this.openai.chat.completions.create({
-			model: 'gpt-4o-2024-11-20',
-			messages: [
-				{
-					role: 'system',
-					content: `
-You are a cover letter writing assistant, given a list of resumes, and a job description, write a compelling cover letter to ensure the user lands their dream job!
-          `
-				},
-				{ role: 'system', content: `` },
-				{ role: 'user', content: 'Write my cover letter!' }
-			],
-			response_format: zodResponseFormat(CoverLetterSchema, 'event')
-		});
+		if (!content) return null;
 
-		return res.choices.map((c) => c.message)[0];
+		return CoverLetterSchema.parse(JSON.parse(content)).content;
 	}
 }
 

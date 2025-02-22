@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { route } from '$lib/ROUTES';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '$lib/utils';
 	import Icon from '@iconify/svelte';
 	import DeleteJobListing from './DeleteJobListing.svelte';
 
