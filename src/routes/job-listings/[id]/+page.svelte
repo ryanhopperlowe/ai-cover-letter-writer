@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import {
-		AccordionContent,
-		AccordionTrigger,
 		Accordion,
-		AccordionItem
+		AccordionContent,
+		AccordionItem,
+		AccordionTrigger
 	} from '$lib/components/ui/accordion';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
+	import { markdown } from '$lib/helpers/micromark.js';
 	import { route } from '$lib/ROUTES';
+	import type { CoverLetterUI } from '$lib/server/db/schema/cover-letters.js';
 	import { handlePromise } from '$lib/utils/handlePromise.js';
 	import Icon from '@iconify/svelte';
 
@@ -21,26 +23,26 @@
 
 	let deletingCl = $state<string | null>(null);
 
-	let copied = $state(false);
+	let copied = $state<string | null>(null);
 	$effect(() => {
 		if (!copied) return;
 
 		const timeout = setTimeout(() => {
-			copied = false;
+			copied = null;
 		}, 6000);
 
 		return () => clearTimeout(timeout);
 	});
 
-	async function handleCopy(text: string) {
-		const [err] = await handlePromise(navigator.clipboard.writeText(text));
+	async function handleCopy(cl: CoverLetterUI) {
+		const [err] = await handlePromise(navigator.clipboard.writeText(cl.content));
 
 		if (err) {
 			console.error(err);
 			return;
 		}
 
-		copied = true;
+		copied = cl.id;
 	}
 </script>
 
@@ -81,8 +83,19 @@
 						Cover letter #{i + 1}
 
 						<span class="invisible flex items-center gap-2 group-hover:visible">
-							<Button variant="ghost" size="icon" onclick={() => handleCopy(cl.content)}>
-								<Icon icon="lucide:copy" />
+							<Button
+								variant="ghost"
+								size="icon"
+								onclick={(e) => {
+									e.stopPropagation();
+									handleCopy(cl);
+								}}
+							>
+								{#if copied === cl.id}
+									<Icon icon="lucide:check" class="text-green-500" />
+								{:else}
+									<Icon icon="lucide:copy" />
+								{/if}
 							</Button>
 
 							<form
@@ -99,6 +112,7 @@
 									variant="ghost"
 									size="icon"
 									type="submit"
+									onclick={(e) => e.stopPropagation()}
 									loading={deletingCl === cl.id}
 									disabled={!!deletingCl}
 								>
@@ -110,7 +124,7 @@
 				</AccordionTrigger>
 
 				<AccordionContent>
-					{cl.content}
+					{@html markdown(cl.content)}
 				</AccordionContent>
 			</AccordionItem>
 		{/each}

@@ -79,7 +79,13 @@ export const actions = {
 			)
 		).filter((x) => x !== null);
 
-		const coverLetterContent = await AiService.generateCoverLetter(listing.content, textContent);
+		const { content, companyName, hiringManager, mission, title: jobTitle } = listing;
+
+		const coverLetterContent = await AiService.generateCoverLetter(
+			content,
+			textContent,
+			JSON.stringify({ companyName, hiringManager, mission, jobTitle })
+		);
 
 		if (coverLetterContent === null) {
 			return fail(500, { errors: { form: ['Failed to generate cover letter'] } });
