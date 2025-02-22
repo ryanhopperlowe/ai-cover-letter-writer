@@ -79,12 +79,12 @@ export const actions = {
 			)
 		).filter((x) => x !== null);
 
-		const { content, companyName, hiringManager, mission, title: jobTitle } = listing;
+		const { content, companyName, hiringManager, mission, title: jobTitle, address } = listing;
 
 		const coverLetterContent = await AiService.generateCoverLetter(
 			content,
 			textContent,
-			JSON.stringify({ companyName, hiringManager, mission, jobTitle })
+			JSON.stringify({ companyName, hiringManager, mission, jobTitle, address })
 		);
 
 		if (coverLetterContent === null) {

@@ -1,5 +1,6 @@
 import { route } from '$lib/ROUTES';
 import { db } from '$lib/server/db';
+import { CoverLetters } from '$lib/server/db/schema/cover-letters';
 import { JobListings, JobListingShema } from '$lib/server/db/schema/job-listings';
 import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -51,6 +52,8 @@ export const handleDeleteListing = async ({ request, locals }: RequestEvent) => 
 	if (listing.userId !== locals.user.id) {
 		return fail(403, { error: 'Forbidden' });
 	}
+
+	await db.delete(CoverLetters).where(eq(CoverLetters.jobListing, id));
 
 	await db.delete(JobListings).where(eq(JobListings.id, id));
 

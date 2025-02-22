@@ -9,6 +9,7 @@ export const JobListings = Orm.table('job_listing', {
 	content: Orm.text().notNull(),
 	hiringManager: Orm.text(),
 	mission: Orm.text(),
+	address: Orm.text(),
 
 	userId: Orm.uuid()
 		.notNull()
@@ -21,7 +22,8 @@ const insert = createInsertSchema(JobListings, {
 	companyName: z.string().min(1, 'Required').max(30),
 	content: z.string().min(1, 'Required'),
 	hiringManager: z.string().max(30).optional(),
-	mission: z.string().optional()
+	mission: z.string().optional(),
+	address: z.string().optional()
 }).omit({
 	createdAt: true,
 	updatedAt: true

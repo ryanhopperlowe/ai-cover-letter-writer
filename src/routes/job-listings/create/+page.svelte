@@ -38,6 +38,12 @@
 	</div>
 
 	<div>
+		<Label for="address">Address (optional)</Label>
+		<Input name="address" value={form?.data?.address ?? ''} />
+		<p class="text-red-500">{form?.errors?.validation.hiringManager}</p>
+	</div>
+
+	<div>
 		<Label for="content">Listing Text</Label>
 		<Textarea name="content" value={form?.data?.content} />
 		<p class="text-red-500">{form?.errors?.validation.content}</p>
