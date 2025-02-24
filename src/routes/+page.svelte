@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { linear } from 'svelte/easing';
 	import { blur } from 'svelte/transition';
 
 	let text = 'Coming Soon';
@@ -18,7 +19,7 @@
 	<h1>
 		{#each Array.from(text) as char, i}
 			{#if mounted}
-				<span in:blur={{ delay: i * 100, amount: 10, duration: 1000 }}>{char}</span>
+				<span in:blur={{ delay: i * 100, amount: 10, duration: 1000, easing: linear }}>{char}</span>
 			{/if}
 		{/each}
 	</h1>
