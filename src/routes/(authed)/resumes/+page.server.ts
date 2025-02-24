@@ -1,14 +1,15 @@
 import { db } from '$lib/server/db';
 import { Resumes, ResumesSchema } from '$lib/server/db/schema/resumes';
 import { StorageClient } from '$lib/server/storage/storage-client.server';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { zfd } from 'zod-form-data';
 import type { Actions, PageServerLoad } from './$types';
+import { route } from '$lib/ROUTES';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		return fail(401, { message: 'Unauthorized' });
+		return redirect(302, route('/login'));
 	}
 
 	const resumes = await db.select().from(Resumes).where(eq(Resumes.userId, locals.user.id));

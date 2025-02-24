@@ -1,12 +1,11 @@
 import * as auth from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { route } from '$lib/ROUTES';
+import { NODE_ENV } from '$env/static/private';
 
-export const load: PageServerLoad = async (event) => {
-	if (!event.locals.user) {
-		redirect(302, '/login');
-	}
-	redirect(302, '/resumes');
+export const load: PageServerLoad = async () => {
+	if (NODE_ENV !== 'production') redirect(302, route('/resumes'));
 };
 
 export const actions: Actions = {
