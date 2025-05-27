@@ -8,7 +8,6 @@
 	$effect(() => {
 		const timeout = setTimeout(() => {
 			mounted = true;
-			console.log('mounted');
 		}, 1000);
 
 		return () => clearTimeout(timeout);
