@@ -1,11 +1,11 @@
+import { COMING_SOON } from '$env/static/private';
+import { route } from '$lib/ROUTES';
 import * as auth from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { route } from '$lib/ROUTES';
-import { NODE_ENV } from '$env/static/private';
 
 export const load: PageServerLoad = async () => {
-	if (NODE_ENV !== 'production') redirect(302, route('/resumes'));
+	if (COMING_SOON !== 'true') redirect(302, route('/resumes'));
 };
 
 export const actions: Actions = {
