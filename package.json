@@ -22,8 +22,7 @@
 		"db:pull": "drizzle-kit pull",
 		"db:migrate": "drizzle-kit migrate",
 		"db:up": "drizzle-kit up",
-		"db:studio": "drizzle-kit studio",
-		"prestart": "pnpm run db:migrate"
+		"db:studio": "drizzle-kit studio"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
