@@ -1,3 +1,4 @@
+import { sql, type AnyColumn } from 'drizzle-orm';
 import {
 	boolean,
 	decimal,
@@ -19,6 +20,14 @@ const baseTable = <TName extends string, TColumns extends Record<string, PgColum
 		createdAt: timestamp('created_at').defaultNow(),
 		updatedAt: timestamp('updated_at').defaultNow()
 	});
+};
+
+export const increment = (column: AnyColumn, amount = 1) => {
+	return sql`${column} + ${amount}`;
+};
+
+export const decrement = (column: AnyColumn, amount = 1) => {
+	return sql`${column} - ${amount}`;
 };
 
 export const Orm = {

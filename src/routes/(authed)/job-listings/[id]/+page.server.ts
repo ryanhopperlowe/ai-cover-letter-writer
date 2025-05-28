@@ -6,9 +6,10 @@ import { JobListings } from '$lib/server/db/schema/job-listings';
 import { Resumes, ResumesSchema } from '$lib/server/db/schema/resumes';
 import { AiService } from '$lib/server/openai';
 import { StorageClient } from '$lib/server/storage/storage-client.server';
-import { fail, redirect, type Actions } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
+import { UserService } from '$lib/server/functions/user-functions';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -28,12 +29,17 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	return { listing, resumes, coverLetters };
 };
 
-export const actions = {
+export const actions: Actions = {
 	createCoverLetter: async ({ locals, params, request }) => {
 		const { user } = locals;
 		if (!user) {
 			redirect(302, route('/login'));
 		}
+
+		if (!user.tokens)
+			return fail(400, {
+				errors: { form: ['Please purchase tokens to generate a cover letter'] }
+			});
 
 		const { id: jobListing } = params;
 
@@ -41,23 +47,27 @@ export const actions = {
 			return fail(400, { errors: { form: ['Invalid id'] } });
 		}
 
+		await UserService.decrementTokens(user.id, 1);
+
 		const [listing] = await db.select().from(JobListings).where(eq(JobListings.id, jobListing));
 
 		if (!listing) {
+			await UserService.incrementTokens(user.id, 1);
 			return fail(404, { errors: { form: ['Listing not found'] } });
 		}
 
 		const formData = await request.formData();
-
 		const resumeIds = ResumesSchema.select.shape.id.array().parse(formData.getAll('resumeIds'));
 
 		if (!resumeIds.length) {
+			await UserService.incrementTokens(user.id, 1);
 			return fail(400, { errors: { form: ['No resumes selected'] } });
 		}
 
 		const resumes = await db.select().from(Resumes).where(inArray(Resumes.id, resumeIds));
 
 		if (!resumes.length) {
+			await UserService.incrementTokens(user.id, 1);
 			return fail(400, { errors: { form: ['No resumes selected'] } });
 		}
 
@@ -88,6 +98,7 @@ export const actions = {
 		);
 
 		if (coverLetterContent === null) {
+			await UserService.incrementTokens(user.id, 1);
 			return fail(500, { errors: { form: ['Failed to generate cover letter'] } });
 		}
 
@@ -126,4 +137,4 @@ export const actions = {
 
 		await db.delete(CoverLetters).where(eq(CoverLetters.id, id));
 	}
-} satisfies Actions;
+};

@@ -4,7 +4,8 @@ import { Orm } from '../helpers';
 
 export const Users = Orm.table('user', {
 	email: Orm.text('email').notNull().unique(),
-	passwordHash: Orm.text('password_hash').notNull()
+	passwordHash: Orm.text('password_hash').notNull(),
+	tokens: Orm.int('tokens').notNull().default(0)
 });
 
 const select = createSelectSchema(Users).omit({ passwordHash: true });

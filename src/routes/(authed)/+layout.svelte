@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { route } from '$lib/ROUTES';
+	import BuyTokens from './BuyTokens.svelte';
 
 	let { children, data } = $props();
 </script>
@@ -17,6 +18,10 @@
 
 				<li>
 					<Button variant="ghost" href={route('/job-listings')}>Job Listings</Button>
+				</li>
+
+				<li>
+					<BuyTokens user={data.user} />
 				</li>
 
 				<li>
