@@ -1,8 +1,8 @@
-import { env } from '$env/dynamic/private';
+import { DATABASE_URL } from '$env/static/private';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 
-if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
 
-const client = neon(env.DATABASE_URL);
+const client = neon(DATABASE_URL);
 export const db = drizzle({ client });

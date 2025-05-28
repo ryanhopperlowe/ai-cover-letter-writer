@@ -38,11 +38,11 @@ importers:
         specifier: ^16.4.7
         version: 16.4.7
       drizzle-orm:
-        specifier: ^0.38.4
-        version: 0.38.4(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)
+        specifier: ^0.40.0
+        version: 0.40.1(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.1.0)(postgres@3.4.5)
       drizzle-zod:
         specifier: ^0.7.0
-        version: 0.7.0(drizzle-orm@0.38.4(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(zod@3.24.1)
+        version: 0.7.0(drizzle-orm@0.40.1(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.1.0)(postgres@3.4.5))(zod@3.24.1)
       micromark:
         specifier: ^4.0.1
         version: 4.0.1
@@ -1679,8 +1679,8 @@ packages:
     resolution: {integrity: sha512-U4wWit0fyZuGuP7iNmRleQyK2V8wCuv57vf5l3MnG4z4fzNTjY/U13M8owyQ5RavqvqxBifWORaR3wIUzlN64g==}
     hasBin: true
 
-  drizzle-orm@0.38.4:
-    resolution: {integrity: sha512-s7/5BpLKO+WJRHspvpqTydxFob8i1vo2rEx4pY6TGY7QSMuUfWUuzaY0DIpXCkgHOo37BaFC+SJQb99dDUXT3Q==}
+  drizzle-orm@0.40.1:
+    resolution: {integrity: sha512-aPNhtiJiPfm3qxz1czrnIDkfvkSdKGXYeZkpG55NPTVI186LmK2fBLMi4dsHpPHlJrZeQ92D322YFPHADBALew==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -1695,20 +1695,19 @@ packages:
       '@tidbcloud/serverless': '*'
       '@types/better-sqlite3': '*'
       '@types/pg': '*'
-      '@types/react': '>=18'
       '@types/sql.js': '*'
       '@vercel/postgres': '>=0.8.0'
       '@xata.io/client': '*'
       better-sqlite3: '>=7'
       bun-types: '*'
       expo-sqlite: '>=14.0.0'
+      gel: '>=2'
       knex: '*'
       kysely: '*'
       mysql2: '>=2'
       pg: '>=8'
       postgres: '>=3'
       prisma: '*'
-      react: '>=18'
       sql.js: '>=1'
       sqlite3: '>=5'
     peerDependenciesMeta:
@@ -1738,8 +1737,6 @@ packages:
         optional: true
       '@types/pg':
         optional: true
-      '@types/react':
-        optional: true
       '@types/sql.js':
         optional: true
       '@vercel/postgres':
@@ -1752,6 +1749,8 @@ packages:
         optional: true
       expo-sqlite:
         optional: true
+      gel:
+        optional: true
       knex:
         optional: true
       kysely:
@@ -1763,8 +1762,6 @@ packages:
       postgres:
         optional: true
       prisma:
-        optional: true
-      react:
         optional: true
       sql.js:
         optional: true
@@ -2739,10 +2736,6 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
-
-  react@19.0.0:
-    resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==}
-    engines: {node: '>=0.10.0'}
 
   read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
@@ -5080,16 +5073,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.4(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0):
+  drizzle-orm@0.40.1(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.1.0)(postgres@3.4.5):
     optionalDependencies:
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.11.6
+      gel: 2.1.0
       postgres: 3.4.5
-      react: 19.0.0
 
-  drizzle-zod@0.7.0(drizzle-orm@0.38.4(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(zod@3.24.1):
+  drizzle-zod@0.7.0(drizzle-orm@0.40.1(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.1.0)(postgres@3.4.5))(zod@3.24.1):
     dependencies:
-      drizzle-orm: 0.38.4(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)
+      drizzle-orm: 0.40.1(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.1.0)(postgres@3.4.5)
       zod: 3.24.1
 
   dunder-proto@1.0.1:
@@ -6061,9 +6054,6 @@ snapshots:
       side-channel: 1.1.0
 
   queue-microtask@1.2.3: {}
-
-  react@19.0.0:
-    optional: true
 
   read-cache@1.0.0:
     dependencies:
