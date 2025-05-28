@@ -26,6 +26,10 @@ export const increment = (column: AnyColumn, amount = 1) => {
 	return sql`${column} + ${amount}`;
 };
 
+export const decrement = (column: AnyColumn, amount = 1) => {
+	return sql`${column} - ${amount}`;
+};
+
 export const Orm = {
 	table: baseTable,
 	text: text,

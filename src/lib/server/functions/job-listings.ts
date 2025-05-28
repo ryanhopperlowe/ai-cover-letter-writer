@@ -59,3 +59,9 @@ export const handleDeleteListing = async ({ request, locals }: RequestEvent) => 
 
 	return { ...parsed };
 };
+
+const getListing = async (id: string) => {
+	return (await db.select().from(JobListings).where(eq(JobListings.id, id))).at(1) ?? null;
+};
+
+export const ListingService = { getListing: getListing };

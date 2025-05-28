@@ -1,4 +1,4 @@
-import { handleCreateListing, handleDeleteListing } from '$lib/actions/job-listings';
+import { handleCreateListing, handleDeleteListing } from '$lib/server/functions/job-listings';
 import { route } from '$lib/ROUTES';
 import { db } from '$lib/server/db';
 import { JobListings, JobListingShema } from '$lib/server/db/schema/job-listings';

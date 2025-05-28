@@ -15,7 +15,7 @@
 	import { handlePromise } from '$lib/utils/handlePromise.js';
 	import Icon from '@iconify/svelte';
 
-	let { data } = $props();
+	let { data, form } = $props();
 	let { listing, resumes, coverLetters } = data;
 
 	let checked = $state<string[]>([]);
@@ -70,7 +70,11 @@
 			</div>
 		{/each}
 
-		<Button type="submit" {loading}>Create Cover Letters</Button>
+		<Button type="submit" disabled={loading} {loading}>Create Cover Letters</Button>
+
+		{#if form?.errors.form.length}
+			<p class="text-red-500">{form.errors.form[0]}</p>
+		{/if}
 	</form>
 
 	<h3>Cover Letters</h3>
