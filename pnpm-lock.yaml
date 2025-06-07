@@ -28,6 +28,9 @@ importers:
       '@oslojs/encoding':
         specifier: ^1.1.0
         version: 1.1.0
+      '@ryact-utils/attempt':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@stripe/stripe-js':
         specifier: ^5.7.0
         version: 5.7.0
@@ -1014,6 +1017,9 @@ packages:
     resolution: {integrity: sha512-ul8rnCsUumNln5YWwz0ted2ZHFhzhRRnkpBZ+YRuHoRAlUji9KChpOUOndY7uykrPEPXVbHLlsdo6v5yXo/TXw==}
     cpu: [x64]
     os: [win32]
+
+  '@ryact-utils/attempt@0.1.1':
+    resolution: {integrity: sha512-dfrlK/wqcRVXzPFT8PAkd2onkarhQ1j4+kHqfR92YNKkRQoeTDTNXU2msv7shdBcXBBhZnd8vx00aqXuYk+XvQ==}
 
   '@smithy/abort-controller@4.0.1':
     resolution: {integrity: sha512-fiUIYgIgRjMWznk6iLJz35K2YxSLHzLBA/RC6lBrKfQ8fHbPfvk7Pk9UvpKoHgJjI18MnbPuEju53zcVy6KF1g==}
@@ -4252,6 +4258,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.31.0':
     optional: true
+
+  '@ryact-utils/attempt@0.1.1': {}
 
   '@smithy/abort-controller@4.0.1':
     dependencies:

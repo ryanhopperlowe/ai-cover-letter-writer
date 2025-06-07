@@ -53,9 +53,10 @@ export const handleDeleteListing = async ({ request, locals }: RequestEvent) => 
 		return fail(403, { error: 'Forbidden' });
 	}
 
-	await db.delete(CoverLetters).where(eq(CoverLetters.jobListing, id));
-
-	await db.delete(JobListings).where(eq(JobListings.id, id));
+	await Promise.all([
+		db.delete(CoverLetters).where(eq(CoverLetters.jobListing, id)),
+		db.delete(JobListings).where(eq(JobListings.id, id))
+	]);
 
 	return { ...parsed };
 };

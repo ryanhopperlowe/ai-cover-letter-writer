@@ -12,8 +12,8 @@
 	import { markdown } from '$lib/helpers/micromark.js';
 	import { route } from '$lib/ROUTES';
 	import type { CoverLetterUI } from '$lib/server/db/schema/cover-letters.js';
-	import { handlePromise } from '$lib/utils/handlePromise.js';
 	import Icon from '@iconify/svelte';
+	import { attempt } from '@ryact-utils/attempt';
 
 	let { data, form } = $props();
 	let { listing, resumes, coverLetters } = data;
@@ -35,7 +35,7 @@
 	});
 
 	async function handleCopy(cl: CoverLetterUI) {
-		const [err] = await handlePromise(navigator.clipboard.writeText(cl.content));
+		const [err] = await attempt(navigator.clipboard.writeText(cl.content));
 
 		if (err) {
 			console.error(err);

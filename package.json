@@ -66,6 +66,7 @@
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
+		"@ryact-utils/attempt": "^0.1.1",
 		"@stripe/stripe-js": "^5.7.0",
 		"cloudflare": "^4.0.0",
 		"dotenv": "^16.4.7",
