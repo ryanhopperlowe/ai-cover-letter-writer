@@ -38,6 +38,38 @@ export const actions: Actions = {
 
 		if (error) return fail(error.status, { errors: { form: [error.message] } });
 	},
+	updateCoverLetter: async ({ locals, request }) => {
+		if (!locals.user) {
+			redirect(302, route('/login'));
+		}
+
+		const formData = await request.formData();
+		const coverLetterId = formData.get('id');
+
+		const errors = <T extends object>(errors: T) => {
+			return {
+				action: 'updateCoverLetter' as const,
+				coverLetterId,
+				errors: { form: [] as string[], ...errors } as const
+			};
+		};
+
+		const parsed = CoverLettersSchema.select
+			.pick({ content: true, id: true })
+			.safeParse(Object.fromEntries(formData));
+
+		if (parsed.error) {
+			return fail(400, errors({ form: parsed.error.flatten().formErrors }));
+		}
+
+		const [err] = await CoverLetterService.updateCoverLetterContent(
+			locals.user,
+			parsed.data.id,
+			parsed.data.content
+		);
+
+		if (err) return fail(err.status, errors({ form: [err.message] }));
+	},
 	deleteCoverLetter: async ({ request, locals }) => {
 		if (!locals.user) {
 			redirect(302, route('/login'));

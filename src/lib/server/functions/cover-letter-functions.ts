@@ -3,7 +3,13 @@ import { db } from '$lib/server/db';
 import { CoverLetters } from '$lib/server/db/schema/cover-letters';
 import { JobListings } from '$lib/server/db/schema/job-listings';
 import { Resumes } from '$lib/server/db/schema/resumes';
-import { attemptApi, BadRequestError, InternalServerError, NotFoundError } from '$lib/server/error';
+import {
+	attemptApi,
+	BadRequestError,
+	InternalServerError,
+	NotFoundError,
+	UnauthorizedError
+} from '$lib/server/error';
 import { AiService } from '$lib/server/openai';
 import { StorageClient } from '$lib/server/storage/storage-client.server';
 import { eq, inArray } from 'drizzle-orm';
@@ -82,4 +88,24 @@ const generateCoverLetter = attemptApi.create(
 	}
 );
 
-export const CoverLetterService = { generateCoverLetter: generateCoverLetter };
+const updateCoverLetterContent = attemptApi.create(
+	async (user: UserUI, coverLetterId: string, content: string) => {
+		await db.transaction(async (tx) => {
+			const [cl] = await tx.select().from(CoverLetters);
+
+			if (!cl) throw new NotFoundError('Cover Letter not found');
+			if (cl.userId !== user.id) throw new UnauthorizedError('Unauthorized');
+
+			await tx
+				.update(CoverLetters)
+				.set({ content })
+				.where(eq(CoverLetters.id, coverLetterId))
+				.execute();
+		});
+	}
+);
+
+export const CoverLetterService = {
+	generateCoverLetter: generateCoverLetter,
+	updateCoverLetterContent: updateCoverLetterContent
+};

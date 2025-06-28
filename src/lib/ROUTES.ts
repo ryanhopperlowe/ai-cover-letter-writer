@@ -40,6 +40,9 @@ const ACTIONS = {
   "createCoverLetter /job-listings/[id]": (params: { id: (string | number) }) => {
     return `/job-listings/${params['id']}?/createCoverLetter`
   },
+  "updateCoverLetter /job-listings/[id]": (params: { id: (string | number) }) => {
+    return `/job-listings/${params['id']}?/updateCoverLetter`
+  },
   "deleteCoverLetter /job-listings/[id]": (params: { id: (string | number) }) => {
     return `/job-listings/${params['id']}?/deleteCoverLetter`
   },
@@ -164,7 +167,7 @@ export function route<T extends keyof AllTypes>(key: T, ...params: any[]): strin
 export type KIT_ROUTES = {
   PAGES: { '/': never, '/job-listings': never, '/job-listings/[id]': 'id', '/job-listings/create': never, '/payment': never, '/resumes': never, '/login': never, '/success/[cartId]': 'cartId' }
   SERVERS: { 'POST /api/checkout': never }
-  ACTIONS: { 'logout /': never, 'create /job-listings': never, 'delete /job-listings': never, 'createCoverLetter /job-listings/[id]': 'id', 'deleteCoverLetter /job-listings/[id]': 'id', 'default /job-listings/create': never, 'upload /resumes': never, 'delete /resumes': never, 'login /login': never, 'register /login': never }
+  ACTIONS: { 'logout /': never, 'create /job-listings': never, 'delete /job-listings': never, 'createCoverLetter /job-listings/[id]': 'id', 'updateCoverLetter /job-listings/[id]': 'id', 'deleteCoverLetter /job-listings/[id]': 'id', 'default /job-listings/create': never, 'upload /resumes': never, 'delete /resumes': never, 'login /login': never, 'register /login': never }
   LINKS: Record<string, never>
   Params: { 'id': never, 'cartId': never }
 }
