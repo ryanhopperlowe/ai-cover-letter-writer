@@ -1,10 +1,10 @@
+import { Users, UsersSchema } from '$lib/server/db/schema/users';
 import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import { Sessions, type CreateSession } from '$lib/server/db/schema/session';
-import { Users } from './db/schema/users';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -32,7 +32,7 @@ export async function validateSessionToken(token: string) {
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
-			user: { id: Users.id, email: Users.email, tokens: Users.tokens },
+			user: Users,
 			session: Sessions
 		})
 		.from(Sessions)
@@ -42,6 +42,7 @@ export async function validateSessionToken(token: string) {
 	if (!result) {
 		return { session: null, user: null };
 	}
+
 	const { session, user } = result;
 
 	const sessionExpired = Date.now() >= session.expiresAt.getTime();
@@ -59,7 +60,7 @@ export async function validateSessionToken(token: string) {
 			.where(eq(Sessions.id, session.id));
 	}
 
-	return { session, user };
+	return { session, user: UsersSchema.select.parse(user) };
 }
 
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
