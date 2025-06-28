@@ -1,15 +1,12 @@
-import { getPdfTextContent } from '$lib/helpers/pdf';
 import { route } from '$lib/ROUTES';
 import { db } from '$lib/server/db';
 import { CoverLetters, CoverLettersSchema } from '$lib/server/db/schema/cover-letters';
 import { JobListings } from '$lib/server/db/schema/job-listings';
 import { Resumes, ResumesSchema } from '$lib/server/db/schema/resumes';
-import { AiService } from '$lib/server/openai';
-import { StorageClient } from '$lib/server/storage/storage-client.server';
+import { CoverLetterService } from '$lib/server/functions/cover-letter-functions';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq, inArray } from 'drizzle-orm';
-import type { PageServerLoad, Actions } from './$types';
-import { UserService } from '$lib/server/functions/user-functions';
+import { eq } from 'drizzle-orm';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -32,81 +29,46 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 export const actions: Actions = {
 	createCoverLetter: async ({ locals, params, request }) => {
 		const { user } = locals;
-		if (!user) {
-			redirect(302, route('/login'));
-		}
-
-		if (!user.tokens)
-			return fail(400, {
-				errors: { form: ['Please purchase tokens to generate a cover letter'] }
-			});
-
-		const { id: jobListing } = params;
-
-		if (!jobListing) {
-			return fail(400, { errors: { form: ['Invalid id'] } });
-		}
-
-		await UserService.decrementTokens(user.id, 1);
-
-		const [listing] = await db.select().from(JobListings).where(eq(JobListings.id, jobListing));
-
-		if (!listing) {
-			await UserService.incrementTokens(user.id, 1);
-			return fail(404, { errors: { form: ['Listing not found'] } });
-		}
+		if (!user) redirect(302, route('/login'));
 
 		const formData = await request.formData();
 		const resumeIds = ResumesSchema.select.shape.id.array().parse(formData.getAll('resumeIds'));
 
-		if (!resumeIds.length) {
-			await UserService.incrementTokens(user.id, 1);
-			return fail(400, { errors: { form: ['No resumes selected'] } });
+		const [error] = await CoverLetterService.generateCoverLetter(user, params.id, resumeIds);
+
+		if (error) return fail(error.status, { errors: { form: [error.message] } });
+	},
+	updateCoverLetter: async ({ locals, request }) => {
+		if (!locals.user) {
+			redirect(302, route('/login'));
 		}
 
-		const resumes = await db.select().from(Resumes).where(inArray(Resumes.id, resumeIds));
+		const formData = await request.formData();
+		const coverLetterId = formData.get('id');
 
-		if (!resumes.length) {
-			await UserService.incrementTokens(user.id, 1);
-			return fail(400, { errors: { form: ['No resumes selected'] } });
+		const errors = <T extends object>(errors: T) => {
+			return {
+				action: 'updateCoverLetter' as const,
+				coverLetterId,
+				errors: { form: [] as string[], ...errors } as const
+			};
+		};
+
+		const parsed = CoverLettersSchema.select
+			.pick({ content: true, id: true })
+			.safeParse(Object.fromEntries(formData));
+
+		if (parsed.error) {
+			return fail(400, errors({ form: parsed.error.flatten().formErrors }));
 		}
 
-		const objects = await Promise.all(
-			resumes.map((resume) => StorageClient.getObject(user.id, resume.bucketPath))
+		const [err] = await CoverLetterService.updateCoverLetterContent(
+			locals.user,
+			parsed.data.id,
+			parsed.data.content
 		);
 
-		const textContent = (
-			await Promise.all(
-				objects.map(async (obj) => {
-					const buffer = await obj.Body?.transformToByteArray();
-
-					if (!buffer) {
-						return null;
-					}
-
-					return getPdfTextContent(buffer.buffer as ArrayBuffer);
-				})
-			)
-		).filter((x) => x !== null);
-
-		const { content, companyName, hiringManager, mission, title: jobTitle, address } = listing;
-
-		const coverLetterContent = await AiService.generateCoverLetter(
-			content,
-			textContent,
-			JSON.stringify({ companyName, hiringManager, mission, jobTitle, address })
-		);
-
-		if (coverLetterContent === null) {
-			await UserService.incrementTokens(user.id, 1);
-			return fail(500, { errors: { form: ['Failed to generate cover letter'] } });
-		}
-
-		await db.insert(CoverLetters).values({
-			content: coverLetterContent,
-			userId: user.id,
-			jobListing
-		});
+		if (err) return fail(err.status, errors({ form: [err.message] }));
 	},
 	deleteCoverLetter: async ({ request, locals }) => {
 		if (!locals.user) {

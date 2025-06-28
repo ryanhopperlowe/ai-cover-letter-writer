@@ -9,11 +9,12 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
-	import { markdown } from '$lib/helpers/micromark.js';
 	import { route } from '$lib/ROUTES';
 	import type { CoverLetterUI } from '$lib/server/db/schema/cover-letters.js';
-	import { handlePromise } from '$lib/utils/handlePromise.js';
+	import { cn } from '$lib/utils';
 	import Icon from '@iconify/svelte';
+	import { attempt } from '@ryact-utils/attempt';
+	import CoverLetterAccordion from './CoverLetterAccordion.svelte';
 
 	let { data, form } = $props();
 	let { listing, resumes, coverLetters } = data;
@@ -22,6 +23,8 @@
 	let loading = $state(false);
 
 	let deletingCl = $state<string | null>(null);
+
+	let loadingMap = $state<Record<string, boolean>>({});
 
 	let copied = $state<string | null>(null);
 	$effect(() => {
@@ -35,7 +38,7 @@
 	});
 
 	async function handleCopy(cl: CoverLetterUI) {
-		const [err] = await handlePromise(navigator.clipboard.writeText(cl.content));
+		const [err] = await attempt(navigator.clipboard.writeText(cl.content));
 
 		if (err) {
 			console.error(err);
@@ -44,6 +47,8 @@
 
 		copied = cl.id;
 	}
+
+	$inspect(loadingMap);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -55,7 +60,7 @@
 		class="flex flex-col gap-4"
 		use:enhance={() => {
 			loading = true;
-			return ({ update }) => update().then(() => (loading = false));
+			return ({ update }) => update().finally(() => (loading = false));
 		}}
 	>
 		{#each resumes as resume}
@@ -81,12 +86,14 @@
 
 	<Accordion type="single">
 		{#each coverLetters as cl, i}
-			<AccordionItem>
-				<AccordionTrigger class="group">
+			{@const formId = `update-${cl.id}`}
+
+			<AccordionItem class="group relative">
+				<AccordionTrigger class="sticky top-0">
 					<div class="flex items-center gap-2">
 						Cover letter #{i + 1}
 
-						<span class="invisible flex items-center gap-2 group-hover:visible">
+						<span class={cn('invisible flex items-center gap-2 group-hover:visible')}>
 							<Button
 								variant="ghost"
 								size="icon"
@@ -107,7 +114,7 @@
 								method="post"
 								use:enhance={() => {
 									deletingCl = cl.id;
-									return ({ update }) => update().then(() => (deletingCl = null));
+									return ({ update }) => update().finally(() => (deletingCl = null));
 								}}
 							>
 								<input type="hidden" name="id" value={cl.id} />
@@ -123,12 +130,28 @@
 									<Icon icon="lucide:trash" />
 								</Button>
 							</form>
+
+							<Button
+								form={formId}
+								type="submit"
+								size="icon"
+								variant="ghost"
+								onclick={(e) => e.stopPropagation()}
+								loading={loadingMap[cl.id]}
+							>
+								<Icon icon="lucide:save" />
+							</Button>
 						</span>
 					</div>
 				</AccordionTrigger>
 
-				<AccordionContent>
-					{@html markdown(cl.content)}
+				<AccordionContent class="overflow-visible">
+					<CoverLetterAccordion
+						coverLetter={cl}
+						{formId}
+						listingId={listing.id}
+						bind:loading={loadingMap[cl.id]}
+					/>
 				</AccordionContent>
 			</AccordionItem>
 		{/each}

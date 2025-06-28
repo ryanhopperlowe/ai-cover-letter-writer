@@ -2,9 +2,9 @@ import { db } from '$lib/server/db';
 import { increment } from '$lib/server/db/helpers';
 import { Carts } from '$lib/server/db/schema/cart';
 import { Users } from '$lib/server/db/schema/users';
-import { handlePromise } from '$lib/utils/handlePromise';
-import { eq } from 'drizzle-orm';
 import { stripe } from '$lib/server/stripe';
+import { attempt } from '@ryact-utils/attempt';
+import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const session = await stripe.checkout.sessions.retrieve(cart.checkoutSessionId);
 	if (session.status !== 'complete') return { error: 'Checkout session incomplete' };
 
-	const [completeErr] = await handlePromise(
+	const [completeErr] = await attempt(
 		Promise.all([
 			db.update(Carts).set({ completed: true }).where(eq(Carts.id, cartId)).execute(),
 			db

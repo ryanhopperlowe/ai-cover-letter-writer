@@ -15,6 +15,6 @@ const insert = createInsertSchema(Users)
 
 export const UsersSchema = { select, insert };
 
-export type User = typeof Users.$inferInsert;
+export type User = typeof Users.$inferSelect;
 export type UserUI = z.infer<typeof select>;
 export type RegisterUser = z.infer<typeof insert>;

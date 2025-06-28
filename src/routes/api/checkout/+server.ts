@@ -1,12 +1,12 @@
 import { PUBLIC_APP_URL } from '$env/static/public';
 import { stripe } from '$lib/server/stripe';
-import { handlePromise } from '$lib/utils/handlePromise';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
 import { Carts } from '$lib/server/db/schema/cart';
 import { TOKEN_PRODUCT_ID } from '$env/static/private';
 import { eq } from 'drizzle-orm';
+import { attempt } from '@ryact-utils/attempt';
 
 export const POST: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
@@ -15,15 +15,15 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	const { quantity } = z.object({ quantity: z.number() }).parse(await request.json());
 
-	const [cartErr, cartResp] = await handlePromise(
+	const cartResp = await attempt(
 		db.insert(Carts).values({ userId: locals.user.id, tokens: quantity }).returning().execute()
 	);
 
-	if (cartErr) return Response.json({ error: 'Failed to create cart' }, { status: 500 });
+	if (cartResp.error) return Response.json({ error: 'Failed to create cart' }, { status: 500 });
 
-	const [{ id: cartId }] = cartResp;
+	const [{ id: cartId }] = cartResp.data;
 
-	const [error, session] = await handlePromise(
+	const [error, session] = await attempt.promise(
 		stripe.checkout.sessions.create({
 			mode: 'payment',
 			client_reference_id: cartId,
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		return Response.json({ error: 'Failed to create stripe session URL' }, { status: 500 });
 	}
 
-	const [sessionErr] = await handlePromise(
+	const [sessionErr] = await attempt.promise(
 		db.update(Carts).set({ checkoutSessionId: session.id }).where(eq(Carts.id, cartId)).execute()
 	);
 
