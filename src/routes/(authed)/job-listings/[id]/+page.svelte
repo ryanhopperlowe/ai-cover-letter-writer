@@ -15,6 +15,9 @@
 	import Icon from '@iconify/svelte';
 	import { attempt } from '@ryact-utils/attempt';
 	import CoverLetterAccordion from './CoverLetterAccordion.svelte';
+	import { jsPDF } from 'jspdf';
+	import { markdown } from '$lib/helpers/micromark';
+	import { fromAction } from 'svelte/attachments';
 
 	let { data, form } = $props();
 	let { listing, resumes, coverLetters } = data;
@@ -23,8 +26,8 @@
 	let loading = $state(false);
 
 	let deletingCl = $state<string | null>(null);
-
 	let loadingMap = $state<Record<string, boolean>>({});
+	let downloading = $state<string | null>(null);
 
 	let copied = $state<string | null>(null);
 	$effect(() => {
@@ -37,6 +40,26 @@
 		return () => clearTimeout(timeout);
 	});
 
+	function downloadFile(
+		data: BlobPart,
+		filename: string,
+		mimeType: string = 'application/octet-stream'
+	): void {
+		const blob = new Blob([data], { type: mimeType });
+		const url = URL.createObjectURL(blob);
+
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+
+		setTimeout(() => {
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}, 0);
+	}
+
 	async function handleCopy(cl: CoverLetterUI) {
 		const [err] = await attempt(navigator.clipboard.writeText(cl.content));
 
@@ -47,8 +70,6 @@
 
 		copied = cl.id;
 	}
-
-	$inspect(loadingMap);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -77,7 +98,7 @@
 
 		<Button type="submit" disabled={loading} {loading}>Create Cover Letters</Button>
 
-		{#if form?.errors.form.length}
+		{#if form?.errors?.form.length}
 			<p class="text-red-500">{form.errors.form[0]}</p>
 		{/if}
 	</form>
@@ -141,6 +162,26 @@
 							>
 								<Icon icon="lucide:save" />
 							</Button>
+
+							<form
+								action={route('downloadCoverLetter /job-listings/[id]', { id: data.listing.id })}
+								method="POST"
+								use:enhance={() => {
+									downloading = cl.id;
+									return ({ update }) => {
+										downloading = null;
+										return update();
+									};
+								}}
+							>
+								<input type="hidden" name="id" value={cl.id} />
+								<Button type="submit" size="icon" variant="ghost" loading={downloading === cl.id}>
+									<Icon icon="lucide:download" />
+								</Button>
+								{#if form?.action === 'download' && form.errors.form.length}
+									<p class="text-red-500">{form.errors.form[0]}</p>
+								{/if}
+							</form>
 						</span>
 					</div>
 				</AccordionTrigger>

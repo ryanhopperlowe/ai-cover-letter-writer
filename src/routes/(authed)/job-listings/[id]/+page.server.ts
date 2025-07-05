@@ -98,5 +98,26 @@ export const actions: Actions = {
 		}
 
 		await db.delete(CoverLetters).where(eq(CoverLetters.id, id));
+	},
+	downloadCoverLetter: async ({ locals, request }) => {
+		if (!locals.user) {
+			redirect(302, route('/login'));
+		}
+
+		const parsed = CoverLettersSchema.select
+			.pick({ id: true })
+			.safeParse(Object.fromEntries(await request.formData()));
+
+		if (parsed.error)
+			return fail(400, {
+				action: 'download' as const,
+				errors: {
+					...parsed.error.flatten().fieldErrors,
+					form: []
+				}
+			});
+
+		const { id } = parsed.data;
+		redirect(301, route('GET /cover-letter/[id]', { id }));
 	}
 };
