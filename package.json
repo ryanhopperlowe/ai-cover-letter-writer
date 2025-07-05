@@ -78,11 +78,13 @@
 		"drizzle-kit": "^0.30.6",
 		"drizzle-orm": "^0.40.0",
 		"drizzle-zod": "^0.7.0",
+		"jspdf": "^3.0.1",
 		"micromark": "^4.0.1",
 		"micromark-extension-gfm": "^3.0.0",
 		"openai": "^4.83.0",
 		"pdfjs-dist": "^4.10.38",
 		"postgres": "^3.4.5",
+		"puppeteer": "^24.11.2",
 		"stripe": "^17.7.0",
 		"zod": "^3.24.1",
 		"zod-form-data": "^2.0.5"

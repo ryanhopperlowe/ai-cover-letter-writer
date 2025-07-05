@@ -27,6 +27,9 @@ const PAGES = {
  * SERVERS
  */
 const SERVERS = {
+  "GET /cover-letter/[id]": (params: { id: (string | number) }) => {
+    return `/cover-letter/${params['id']}`
+  },
   "POST /api/checkout": `/api/checkout`
 }
 
@@ -45,6 +48,9 @@ const ACTIONS = {
   },
   "deleteCoverLetter /job-listings/[id]": (params: { id: (string | number) }) => {
     return `/job-listings/${params['id']}?/deleteCoverLetter`
+  },
+  "downloadCoverLetter /job-listings/[id]": (params: { id: (string | number) }) => {
+    return `/job-listings/${params['id']}?/downloadCoverLetter`
   },
   "default /job-listings/create": `/job-listings/create`,
   "upload /resumes": `/resumes?/upload`,
@@ -166,8 +172,8 @@ export function route<T extends keyof AllTypes>(key: T, ...params: any[]): strin
 */
 export type KIT_ROUTES = {
   PAGES: { '/': never, '/job-listings': never, '/job-listings/[id]': 'id', '/job-listings/create': never, '/payment': never, '/resumes': never, '/login': never, '/success/[cartId]': 'cartId' }
-  SERVERS: { 'POST /api/checkout': never }
-  ACTIONS: { 'logout /': never, 'create /job-listings': never, 'delete /job-listings': never, 'createCoverLetter /job-listings/[id]': 'id', 'updateCoverLetter /job-listings/[id]': 'id', 'deleteCoverLetter /job-listings/[id]': 'id', 'default /job-listings/create': never, 'upload /resumes': never, 'delete /resumes': never, 'login /login': never, 'register /login': never }
+  SERVERS: { 'GET /cover-letter/[id]': 'id', 'POST /api/checkout': never }
+  ACTIONS: { 'logout /': never, 'create /job-listings': never, 'delete /job-listings': never, 'createCoverLetter /job-listings/[id]': 'id', 'updateCoverLetter /job-listings/[id]': 'id', 'deleteCoverLetter /job-listings/[id]': 'id', 'downloadCoverLetter /job-listings/[id]': 'id', 'default /job-listings/create': never, 'upload /resumes': never, 'delete /resumes': never, 'login /login': never, 'register /login': never }
   LINKS: Record<string, never>
   Params: { 'id': never, 'cartId': never }
 }
